@@ -1,0 +1,79 @@
+[gd_scene load_steps=11 format=3 uid="uid://v5gq16pp8iia"]
+
+[ext_resource type="Script" uid="uid://bg0uj63dmrdqk" path="res://drone.gd" id="1_ig7tw"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7dm0k"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_ig7tw"]
+sky_material = SubResource("ProceduralSkyMaterial_7dm0k")
+
+[sub_resource type="Environment" id="Environment_0xm2m"]
+background_mode = 2
+sky = SubResource("Sky_ig7tw")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_h2yge"]
+colors = PackedColorArray(0.248921, 0.307902, 0.108262, 1, 0.388064, 0.507026, 0.261794, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_1bvp3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lquwl"]
+color_ramp = SubResource("Gradient_h2yge")
+noise = SubResource("FastNoiseLite_1bvp3")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7mycd"]
+albedo_texture = SubResource("NoiseTexture2D_lquwl")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_272bh"]
+size = Vector3(6, 1, 6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5vw27"]
+size = Vector3(6, 1, 6)
+
+[node name="main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0xm2m")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.05457, 0)
+use_collision = true
+size = Vector3(55, 1, 55)
+material = SubResource("StandardMaterial3D_7mycd")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.484957, 1.48977, 13.9331)
+
+[node name="drone" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.37117, 0)
+linear_damp = 2.0
+angular_damp = 3.0
+script = ExtResource("1_ig7tw")
+angle_kp = 3.0
+angle_ki = 1.0
+angle_kd = 0.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="drone"]
+shape = SubResource("BoxShape3D_272bh")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="drone/CollisionShape3D"]
+mesh = SubResource("BoxMesh_5vw27")
+
+[node name="MotorFrontLeft" type="Node3D" parent="drone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+
+[node name="MotorFrontRight" type="Node3D" parent="drone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+
+[node name="MotorRearLeft" type="Node3D" parent="drone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+
+[node name="MotorRearRight" type="Node3D" parent="drone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
